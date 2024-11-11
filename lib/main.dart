@@ -5,7 +5,30 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 
-void main() => runApp(MyApp());
+import 'package:logging/logging.dart';
+
+// ロガーのインスタンスを作成
+final logger = Logger('MyAppLogger');
+
+// void main() => runApp(MyApp());
+
+void main() {
+  // ログレベルを設定
+  Logger.root.level = Level.ALL;  // 出力するログのレベルを設定
+
+  // ログの出力形式を設定
+  Logger.root.onRecord.listen((record) {
+    print('${record.level.name}: ${record.time}: ${record.message}');
+  });
+
+  // ログを出力
+  final logger = Logger('MyAppLogger');
+  logger.info('App started');
+
+  // アプリの起動
+  runApp(MyApp());
+}
+
 
 class MyApp extends StatelessWidget {
   @override
@@ -35,7 +58,8 @@ class _TimerPageState extends State<TimerPage> {
   @override
   void initState() {
     super.initState();
-    _audioPlayer = AudioPlayer();
+    final _audioPlayer = AudioPlayer();
+    _audioPlayer.setPlayerMode(PlayerMode.lowLatency);
   }
 
   @override
@@ -46,9 +70,14 @@ class _TimerPageState extends State<TimerPage> {
 
   void _playClickSound() async {
     try {
+      logger.info('Start SE setting');
+      // await _audioPlayer.setSource(AssetSource('assets/sounds/se.mp3'));
+      // _audioPlayer.play(AssetSource('assets/sounds/se.mp3'));
       for (int i = 0; i < _alarmCount; i++) {
+        _audioPlayer.seek(Duration.zero);
         await _audioPlayer.play(AssetSource('sounds/se.mp3'));
-        await Future.delayed(Duration(seconds: 1)); // アラームが鳴り終わるまで少し待つ
+        // _audioPlayer.resume();
+        await Future.delayed(Duration(seconds: 3)); // アラームが鳴り終わるまで少し待つ
       }
     } catch (e) {
       print('Error playing audio: $e');
