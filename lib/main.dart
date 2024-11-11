@@ -1,8 +1,9 @@
-import 'dart:ffi';
+// import 'dart:ffi';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
 
 void main() => runApp(MyApp());
 
@@ -24,6 +25,36 @@ class _TimerPageState extends State<TimerPage> {
   Duration _duration = Duration(hours: 0, minutes: 0, seconds: 0);
   Timer? _timer;
 
+  // late Timer _timer;
+  late AudioPlayer _audioPlayer;
+  // int _seconds = 0;
+  bool _isRunning = false;
+  // bool _buttonCooldown = false; // ボタンが押されるのを制御するフラグ
+  int _alarmCount = 5; // アラームを鳴らす回数
+
+  @override
+  void initState() {
+    super.initState();
+    _audioPlayer = AudioPlayer();
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
+  void _playClickSound() async {
+    try {
+      for (int i = 0; i < _alarmCount; i++) {
+        await _audioPlayer.play(AssetSource('sounds/se.mp3'));
+        await Future.delayed(Duration(seconds: 1)); // アラームが鳴り終わるまで少し待つ
+      }
+    } catch (e) {
+      print('Error playing audio: $e');
+    }
+  }
+
   void _startTimer() {
     if (_timer != null) {
       _timer!.cancel();
@@ -32,8 +63,14 @@ class _TimerPageState extends State<TimerPage> {
       setState(() {
         if (_duration.inSeconds > 0) {
           _duration -= Duration(seconds: 1);
+          _isRunning = true;
         } else {
           _timer!.cancel();
+          if (_isRunning != false)
+          {
+            _isRunning = false;
+            _playClickSound(); // タイマーがゼロになったらアラームを再生
+          }
         }
       });
     });
@@ -121,7 +158,7 @@ class _TimerPageState extends State<TimerPage> {
 
   void _stopTimer() {
     //TODO
-    
+
     // if (_timer != null) {
     //   _timer!.cancel();
     // }
@@ -156,7 +193,7 @@ class _TimerPageState extends State<TimerPage> {
     // 画面に合わせた配置
     // ボタン幅と高さ
     double widthsize_button = MediaQuery.of(context).size.width * 0.75;
-    double heightsize_button = MediaQuery.of(context).size.height * 0.10;
+    // double heightsize_button = MediaQuery.of(context).size.height * 0.10;
     // ボタン配置
     // double widthsize_button_position = MediaQuery.of(context).size.width * 0.75;
     double heightsize_button_position = MediaQuery.of(context).size.height * 0.025;
@@ -208,7 +245,7 @@ class _TimerPageState extends State<TimerPage> {
               height: heightsize_button_position,
               ),
             ElevatedButton(
-              onPressed: _showTimePicker,
+              onPressed: _startTimer,
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10), // 角丸の半径
