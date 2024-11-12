@@ -139,11 +139,12 @@ class _TimerPageState extends State<TimerPage> {
                   ElevatedButton(
                     onPressed: () {
                       if (tempDuration.inHours < 0 ||
-                          tempDuration.inMinutes >= 60 ||
-                          tempDuration.inSeconds >= 60) {
+                          tempDuration.inMinutes < 0 ||
+                          tempDuration.inSeconds < 0) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('不正な値が設定されました'),
+                            // content: Text('不正な値が設定されました'),
+                            content: Text('Value: ${tempDuration.inMinutes}'),
                           ),
                         );
                       } else {
@@ -310,7 +311,7 @@ class _TimerPageState extends State<TimerPage> {
                 // height: heightsize_button,
                 child: Center(
                   child: Text(
-                    '停　止',
+                    'タイマー停止',
                     style: TextStyle(fontSize: fontSize_timer_button), // 画面幅に基づいたフォントサイズ
                   ),
                 ),
