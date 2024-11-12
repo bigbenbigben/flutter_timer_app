@@ -69,7 +69,7 @@ class _TimerPageState extends State<TimerPage> {
     super.dispose();
   }
 
-  void _playClickSound() async {
+  void playAlarmSound() async {
     try {
       int playDuration = _selectedPlayDuration * 60; // 秒単位に変換
       int elapsed = 0;
@@ -87,6 +87,10 @@ class _TimerPageState extends State<TimerPage> {
     }
   }
 
+  Future<void> stopAlarmSound() async {
+    await _audioPlayer.stop();
+  }
+
   void _startTimer() {
     if (_timer != null) {
       _timer!.cancel();
@@ -99,7 +103,7 @@ class _TimerPageState extends State<TimerPage> {
         } else {
           _timer!.cancel();
           if (_isRunning != false) {
-            _playClickSound(); // タイマーがゼロになったらアラームを再生
+            playAlarmSound(); // タイマーがゼロになったらアラームを再生
           }
         }
       });
@@ -190,18 +194,19 @@ class _TimerPageState extends State<TimerPage> {
   void _stopTimer() {
     //TODO
 
-    // if (_timer != null) {
-    //   _timer!.cancel();
-    // }
-    // _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-    //   setState(() {
-    //     if (_duration.inSeconds > 0) {
-    //       _duration -= Duration(seconds: 1);
-    //     } else {
-    //       _timer!.cancel();
-    //     }
-    //   });
-    // });
+    if (_timer != null) {
+      _timer!.cancel();
+      stopAlarmSound();
+    }
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_duration.inSeconds > 0) {
+          _duration -= Duration(seconds: 1);
+        } else {
+          _timer!.cancel();
+        }
+      });
+    });
   }
 
   String _formatDuration(Duration duration) {
