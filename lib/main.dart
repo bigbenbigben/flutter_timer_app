@@ -49,7 +49,7 @@ class _TimerPageState extends State<TimerPage> {
   Timer? _timer;
 
   // late Timer _timer;
-  late AudioPlayer _audioPlayer;
+  late AudioPlayer _audioPlayer = AudioPlayer();
   // int _seconds = 0;
   bool _isRunning = false;
 
