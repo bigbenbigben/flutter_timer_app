@@ -49,17 +49,20 @@ class _TimerPageState extends State<TimerPage> {
   Timer? _timer;
 
   // late Timer _timer;
-  late AudioPlayer _audioPlayer;
+  late AudioPlayer _audioPlayer = AudioPlayer();
   // int _seconds = 0;
   bool _isRunning = false;
   // bool _buttonCooldown = false; // ボタンが押されるのを制御するフラグ
-  int _alarmCount = 5; // アラームを鳴らす回数
+  int _alarmCount = 3; // アラームを鳴らす回数
 
   @override
   void initState() {
     super.initState();
     final _audioPlayer = AudioPlayer();
-    _audioPlayer.setPlayerMode(PlayerMode.lowLatency);
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    //   await _audioPlayer.setSource(AssetSource('sounds/se.mp3'));
+    //   // await _audioPlayer.resume();
+    // });
   }
 
   @override
@@ -70,14 +73,18 @@ class _TimerPageState extends State<TimerPage> {
 
   void _playClickSound() async {
     try {
-      logger.info('Start SE setting');
+      logger.info('Start alarm setting');
       // await _audioPlayer.setSource(AssetSource('assets/sounds/se.mp3'));
       // _audioPlayer.play(AssetSource('assets/sounds/se.mp3'));
+      // await _audioPlayer.play(AssetSource('sounds/se.mp3'));
+      // await _audioPlayer.setSource(AssetSource('sounds/se.mp3'));
+      // await Future.delayed(Duration(seconds: 2)); // アラームが鳴り終わるまで少し待つ
       for (int i = 0; i < _alarmCount; i++) {
-        _audioPlayer.seek(Duration.zero);
+        logger.info('play alarm');
         await _audioPlayer.play(AssetSource('sounds/se.mp3'));
         // _audioPlayer.resume();
-        await Future.delayed(Duration(seconds: 3)); // アラームが鳴り終わるまで少し待つ
+        await Future.delayed(Duration(seconds: 2)); // アラームが鳴り終わるまで少し待つ
+        _audioPlayer.seek(Duration.zero);
       }
     } catch (e) {
       print('Error playing audio: $e');
