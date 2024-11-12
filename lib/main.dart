@@ -92,22 +92,28 @@ class _TimerPageState extends State<TimerPage> {
   }
 
   void _startTimer() {
-    if (_timer != null) {
-      _timer!.cancel();
-    }
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        if (_duration.inSeconds > 0) {
-          _duration -= Duration(seconds: 1);
-          _isRunning = true;
-        } else {
-          _timer!.cancel();
-          if (_isRunning != false) {
-            playAlarmSound(); // タイマーがゼロになったらアラームを再生
+    if (_timer == null || !_timer!.isActive) {
+      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+        setState(() {
+          if (_duration.inSeconds > 0) {
+            _duration -= Duration(seconds: 1);
+            _isRunning = true;
+          } else {
+            _timer!.cancel();
+            if (_isRunning != false) {
+              playAlarmSound(); // タイマーがゼロになったらアラームを再生
+            }
           }
-        }
+        });
       });
-    });
+
+
+    }
+    else {
+      _timer!.cancel();
+      logger.info('pause');
+
+    }
   }
 
   void _showTimePicker() {
