@@ -49,7 +49,7 @@ class _TimerPageState extends State<TimerPage> {
   Timer? _timer;
 
   // late Timer _timer;
-  late AudioPlayer _audioPlayer = AudioPlayer();
+  late AudioPlayer _audioPlayer;
   // int _seconds = 0;
   bool _isRunning = false;
 
@@ -59,7 +59,7 @@ class _TimerPageState extends State<TimerPage> {
   @override
   void initState() {
     super.initState();
-    final _audioPlayer = AudioPlayer();
+    _audioPlayer = AudioPlayer();
     // _audioPlayer.setPlayerMode(PlayerMode.lowLatency);
   }
 
