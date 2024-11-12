@@ -52,14 +52,15 @@ class _TimerPageState extends State<TimerPage> {
   late AudioPlayer _audioPlayer;
   // int _seconds = 0;
   bool _isRunning = false;
-  // bool _buttonCooldown = false; // ボタンが押されるのを制御するフラグ
-  int _alarmCount = 5; // アラームを鳴らす回数
+
+  // SEを鳴らす時間の選択肢とデフォルトの設定
+  int _selectedPlayDuration = 3; // デフォルトは3分
 
   @override
   void initState() {
     super.initState();
     final _audioPlayer = AudioPlayer();
-    _audioPlayer.setPlayerMode(PlayerMode.lowLatency);
+    // _audioPlayer.setPlayerMode(PlayerMode.lowLatency);
   }
 
   @override
@@ -70,14 +71,16 @@ class _TimerPageState extends State<TimerPage> {
 
   void _playClickSound() async {
     try {
-      logger.info('Start SE setting');
-      // await _audioPlayer.setSource(AssetSource('assets/sounds/se.mp3'));
-      // _audioPlayer.play(AssetSource('assets/sounds/se.mp3'));
-      for (int i = 0; i < _alarmCount; i++) {
+      int playDuration = _selectedPlayDuration * 60; // 秒単位に変換
+      int elapsed = 0;
+
+      await _audioPlayer.play(AssetSource('sounds/se.mp3'));
+      await Future.delayed(Duration(seconds: 3)); // 再生が終わるまで待機
+      while (elapsed < playDuration) {
         _audioPlayer.seek(Duration.zero);
         await _audioPlayer.play(AssetSource('sounds/se.mp3'));
-        // _audioPlayer.resume();
-        await Future.delayed(Duration(seconds: 3)); // アラームが鳴り終わるまで少し待つ
+        await Future.delayed(Duration(seconds: 3)); // 再生が終わるまで待機
+        elapsed += 3;
       }
     } catch (e) {
       print('Error playing audio: $e');
@@ -95,9 +98,7 @@ class _TimerPageState extends State<TimerPage> {
           _isRunning = true;
         } else {
           _timer!.cancel();
-          if (_isRunning != false)
-          {
-            _isRunning = false;
+          if (_isRunning != false) {
             _playClickSound(); // タイマーがゼロになったらアラームを再生
           }
         }
@@ -317,9 +318,43 @@ class _TimerPageState extends State<TimerPage> {
                 ),
               ),
             ),
+            SizedBox(height: 20),
+            // SE再生時間の選択UI
+            Text("アラーム再生時間を選択", style: TextStyle(fontSize: 18)),
+            DropdownButton<int>(
+              value: _selectedPlayDuration,
+              items: [1, 3, 5, 10].map((value) {
+                return DropdownMenuItem<int>(
+                  value: value,
+                  child: Text("$value 分"),
+                );
+              }).toList(),
+              onChanged: (newValue) {
+                setState(() {
+                  _selectedPlayDuration = newValue!;
+                });
+              },
+            ),
           ],
         ),
       ),
     );
+        // ),
+        //     SizedBox(height: 20),
+        //     // SE再生時間の選択UI
+        //     Text("アラーム再生時間を選択", style: TextStyle(fontSize: 18)),
+        //     DropdownButton<int>(
+        //       value: _selectedPlayDuration,
+        //       items: [1, 3, 5, 10].map((value) {
+        //         return DropdownMenuItem<int>(
+        //           value: value,
+        //           child: Text("$value 分"),
+        //         );
+        //       }).toList(),
+        //       onChanged: (newValue) {
+        //         setState(() {
+        //           _selectedPlayDuration = newValue!;
+        //         });
+        //       },
   }
 }
