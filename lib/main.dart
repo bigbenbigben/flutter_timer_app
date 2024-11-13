@@ -197,22 +197,16 @@ class _TimerPageState extends State<TimerPage> {
     );
   }
 
-  void _stopTimer() {
-    //TODO
-
-    if (_timer != null) {
-      _timer!.cancel();
+  void _resetTimer() {
+    if (_timer != null && !_timer!.isActive) {
+      _timer!.cancel(); // タイマーをキャンセル
       stopAlarmSound();
-    }
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      logger.info('reset timer');
       setState(() {
-        if (_duration.inSeconds > 0) {
-          _duration -= Duration(seconds: 1);
-        } else {
-          _timer!.cancel();
-        }
+        _duration = Duration.zero; // 残り時間をゼロにリセット
+        _isRunning = false; // タイマーが動いていない状態にリセット
       });
-    });
+    }
   }
 
   String _formatDuration(Duration duration) {
