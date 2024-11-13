@@ -69,7 +69,7 @@ class _TimerPageState extends State<TimerPage> {
     super.dispose();
   }
 
-  void playAlarmSound() async {
+  Future<void> playAlarmSound() async {
     try {
       int playDuration = _selectedPlayDuration * 60; // 秒単位に変換
       int elapsed = 0;
