@@ -81,8 +81,10 @@ class _TimerPageState extends State<TimerPage> {
         _audioPlayer.seek(Duration.zero);
         await _audioPlayer.play(AssetSource('sounds/se.mp3'));
         await Future.delayed(Duration(seconds: 3)); // 再生が終わるまで待機
+        if (!_isRunning) break;
         elapsed += 3;
       }
+      await _audioPlayer.stop(); // 最終的に完全停止
     } catch (e) {
       print('Error playing audio: $e');
     }
@@ -90,25 +92,30 @@ class _TimerPageState extends State<TimerPage> {
 
   Future<void> stopAlarmSound() async {
     await _audioPlayer.stop();
+    
   }
 
   void _startTimer() {
     if (_timer == null || !_timer!.isActive) {
       _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+        logger.info('test');
         setState(() {
           if (_duration.inSeconds > 0) {
             _duration -= Duration(seconds: 1);
             _isRunning = true;
           } else {
+            logger.info('Timer paused');
             _timer!.cancel();
             if (_isRunning != false) {
               playAlarmSound(); // タイマーがゼロになったらアラームを再生
             }
+            else {
+              logger.info('Alarm stopped');
+              stopAlarmSound();
+            }
           }
         });
       });
-
-
     }
     else {
       _timer!.cancel();
