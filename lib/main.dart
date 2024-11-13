@@ -45,7 +45,8 @@ class TimerPage extends StatefulWidget {
 }
 
 class _TimerPageState extends State<TimerPage> {
-  Duration _duration = Duration(hours: 0, minutes: 0, seconds: 0);
+  Duration _duration = const Duration(hours: 0, minutes: 0, seconds: 0);
+  Duration _setDuration = const Duration(hours: 0, minutes: 0, seconds: 0);
   Timer? _timer;
 
   // late Timer _timer;
@@ -149,18 +150,20 @@ class _TimerPageState extends State<TimerPage> {
                   // OKボタン
                   ElevatedButton(
                     onPressed: () {
-                      if (tempDuration.inHours < 0 ||
-                          tempDuration.inMinutes < 0 ||
-                          tempDuration.inSeconds < 0) {
+                      if (_setDuration.inHours < 0 ||
+                          _setDuration.inMinutes < 0 ||
+                          _setDuration.inSeconds < 0) {
+                        _setDuration = const Duration(hours: 0, minutes: 0, seconds: 0);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             // content: Text('不正な値が設定されました'),
-                            content: Text('Value: ${tempDuration.inMinutes}'),
+                            content: Text('Value: ${_setDuration.inMinutes}'),
                           ),
                         );
                       } else {
                         setState(() {
                           _duration = tempDuration;
+                          _setDuration = tempDuration;
                         });
                         Navigator.pop(context);
                       }
@@ -183,7 +186,7 @@ class _TimerPageState extends State<TimerPage> {
                 width: MediaQuery.of(context).size.width, // 画面いっぱいの幅
                 height: MediaQuery.of(context).size.height * 0.5, // 画面高さの50%を指定
                 child: CupertinoTimerPicker(
-                  initialTimerDuration: _duration,
+                  initialTimerDuration: _setDuration,
                   mode: CupertinoTimerPickerMode.hms,
                   onTimerDurationChanged: (Duration newDuration) {
                     tempDuration = newDuration;
@@ -255,7 +258,7 @@ class _TimerPageState extends State<TimerPage> {
             SizedBox(
               // width: widthsize_button,
               // height: heightsize_button,
-              ),
+            ),
             ElevatedButton(
               onPressed: _showTimePicker,
               style: ElevatedButton.styleFrom(
@@ -305,7 +308,7 @@ class _TimerPageState extends State<TimerPage> {
               height: heightsize_button_position * 4,
               ),
             ElevatedButton(
-              onPressed: _stopTimer,
+              onPressed: _resetTimer,
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10), // 角丸の半径
