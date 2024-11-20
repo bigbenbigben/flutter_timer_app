@@ -39,6 +39,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// タイマー画面を管理、状態管理が必要
 class TimerPage extends StatefulWidget {
   @override
   _TimerPageState createState() => _TimerPageState();
@@ -57,6 +58,7 @@ class _TimerPageState extends State<TimerPage> {
   // SEを鳴らす時間の選択肢とデフォルトの設定
   int _selectedPlayDuration = 3; // デフォルトは3分
 
+// 初期化処理
   @override
   void initState() {
     super.initState();
@@ -70,6 +72,7 @@ class _TimerPageState extends State<TimerPage> {
     super.dispose();
   }
 
+// アラーム音の再生
   Future<void> playAlarmSound() async {
     try {
       int playDuration = _selectedPlayDuration * 60; // 秒単位に変換
@@ -90,11 +93,13 @@ class _TimerPageState extends State<TimerPage> {
     }
   }
 
+// アラーム音の停止
   Future<void> stopAlarmSound() async {
     await _audioPlayer.stop();
     
   }
 
+// タイマーの開始と停止
   void _startTimer() {
     if (_timer == null || !_timer!.isActive) {
       _timer = Timer.periodic(Duration(seconds: 1), (timer) {
@@ -124,6 +129,7 @@ class _TimerPageState extends State<TimerPage> {
     }
   }
 
+// タイマー設定のUI
   void _showTimePicker() {
     Duration tempDuration = _duration; // 選択された時間を一時保存
     showModalBottomSheet(
@@ -227,6 +233,7 @@ class _TimerPageState extends State<TimerPage> {
     return "$hours:$minutes:$seconds";
   }
 
+// UIレイアウト
   @override
   Widget build(BuildContext context) {
     // 画面に合わせたフォントサイズ
