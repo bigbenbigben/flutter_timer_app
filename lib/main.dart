@@ -292,7 +292,7 @@ class _TimerPageState extends State<TimerPage> {
               // width: widthsize_button,
               // height: heightsize_button,
             ),
-            ElevatedButton(
+            IconButton(
               onPressed: _showTimePicker,
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
@@ -300,25 +300,26 @@ class _TimerPageState extends State<TimerPage> {
                 ),
                 padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
               ),
-              child: SizedBox(
-                width: widthsize_button,
-                // height: heightsize_button,
-                child: Center(
-                  child: widget(
-                    child: Text(
-                      '時間を設定',
-                      style: TextStyle(fontSize: fontSize_timer_button), // 画面幅に基づいたフォントサイズ
-                    ),
-                  ),
-                ),
-              ),
+              icon: Icon(Icons.access_alarms),
+              iconSize: 48.0,
+              color: Theme.of(context).primaryColor,
+              // child: SizedBox(
+              //   width: widthsize_button,
+              //   // height: heightsize_button,
+              //   child: Center(
+              //       child: Text(
+              //         '時間を設定',
+              //         style: TextStyle(fontSize: fontSize_timer_button), // 画面幅に基づいたフォントサイズ
+              //       ),
+              //   ),
+              // ),
             ),
 
             SizedBox(
               width: widthsize_button,
               height: heightsize_button_position,
               ),
-            ElevatedButton(
+            IconButton(
               onPressed: _startTimer,
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
@@ -326,23 +327,27 @@ class _TimerPageState extends State<TimerPage> {
                 ),
                 padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
               ),
-              child: SizedBox(
-                width: widthsize_button,
-                // height: heightsize_button,
-                child: Center(
-                  child: Text(
-                    'タイマー開始',
-                    style: TextStyle(fontSize: fontSize_timer_button), // 画面幅に基づいたフォントサイズ
-                  ),
-                ),
-              ),
+              icon: Icon(_timer!.isActive ? Icons.pause : Icons.play_arrow),
+              iconSize: 48.0,
+              color: Theme.of(context).primaryColor,
+              // child: SizedBox(
+              //   width: widthsize_button,
+              //   // height: heightsize_button,
+              //   child: Center(
+              //     child: Text(
+              //       'タイマー開始',
+              //       style: TextStyle(fontSize: fontSize_timer_button), // 画面幅に基づいたフォントサイズ
+              //     ),
+              //   ),
+              // ),
             ),
 
             SizedBox(
               width: widthsize_button,
               height: heightsize_button_position * 4,
               ),
-            ElevatedButton(
+            // ElevatedButton(
+              IconButton(
               onPressed: _resetTimer,
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
@@ -350,16 +355,19 @@ class _TimerPageState extends State<TimerPage> {
                 ),
                 padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
               ),
-              child: SizedBox(
-                width: widthsize_button,
-                // height: heightsize_button,
-                child: Center(
-                  child: Text(
-                    'タイマー停止',
-                    style: TextStyle(fontSize: fontSize_timer_button), // 画面幅に基づいたフォントサイズ
-                  ),
-                ),
-              ),
+              icon: Icon(Icons.stop),
+              iconSize: 48.0,
+              color: Theme.of(context).primaryColor,
+              // child: SizedBox(
+              //   width: widthsize_button,
+              //   // height: heightsize_button,
+              //   child: Center(
+              //     child: Text(
+              //       'タイマー停止',
+              //       style: TextStyle(fontSize: fontSize_timer_button), // 画面幅に基づいたフォントサイズ
+              //     ),
+              //   ),
+              // ),
             ),
             SizedBox(height: 20),
             // SE再生時間の選択UI
