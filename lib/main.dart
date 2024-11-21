@@ -259,7 +259,7 @@ class _TimerPageState extends State<TimerPage> {
     // タイトル
     double fontSize_title = MediaQuery.of(context).size.width * 0.15;
     // タイマー
-    double fontSize_timer = MediaQuery.of(context).size.width * 0.25;
+    double fontSize_timer = MediaQuery.of(context).size.width * 0.20;
     // ボタン
     double fontSize_timer_button = MediaQuery.of(context).size.width * 0.10;
     // 画面に合わせた配置
