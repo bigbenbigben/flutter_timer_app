@@ -96,7 +96,7 @@ class _TimerPageState extends State<TimerPage> {
 // アラーム音の停止
   Future<void> stopAlarmSound() async {
     await _audioPlayer.stop();
-    
+
   }
 
 // タイマーの開始と停止
@@ -131,7 +131,8 @@ class _TimerPageState extends State<TimerPage> {
 
 // タイマー設定のUI
   void _showTimePicker() {
-    Duration tempDuration = _duration; // 選択された時間を一時保存
+    Duration tempDuration = _setDuration; // 選択した時間を一時保存
+    // tempDuration = _duration;
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -174,10 +175,28 @@ class _TimerPageState extends State<TimerPage> {
                           ),
                         );
                       } else {
+                        // if (_isRunning != true){
                         setState(() {
+                            logger.info('Duration set');
                           _duration = tempDuration;
                           _setDuration = tempDuration;
-                        });
+
+                          });
+                        // }
+                        // else if (_timer == null || !_timer!.isActive) {
+                        //   setState(() {
+                        //     logger.info('Duration check');
+                        //     logger.info('Duration: ${_duration.inHours} hours, ${_duration.inMinutes % 60} minutes, ${_duration.inSeconds % 60} seconds');
+                        //     _duration = tempDuration;
+                        //     _setDuration = tempDuration;
+                        //   });
+                        // } else {
+                        //   setState(() {
+                        //     logger.info('Duration active');
+                        //     _duration = tempDuration;
+                        //     _setDuration = tempDuration;
+                        //   });
+                        // }
                         Navigator.pop(context);
                       }
                     },
