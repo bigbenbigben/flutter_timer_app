@@ -304,9 +304,11 @@ class _TimerPageState extends State<TimerPage> {
                 width: widthsize_button,
                 // height: heightsize_button,
                 child: Center(
-                  child: Text(
-                    '時間を設定',
-                    style: TextStyle(fontSize: fontSize_timer_button), // 画面幅に基づいたフォントサイズ
+                  child: widget(
+                    child: Text(
+                      '時間を設定',
+                      style: TextStyle(fontSize: fontSize_timer_button), // 画面幅に基づいたフォントサイズ
+                    ),
                   ),
                 ),
               ),
@@ -380,22 +382,5 @@ class _TimerPageState extends State<TimerPage> {
         ),
       ),
     );
-        // ),
-        //     SizedBox(height: 20),
-        //     // SE再生時間の選択UI
-        //     Text("アラーム再生時間を選択", style: TextStyle(fontSize: 18)),
-        //     DropdownButton<int>(
-        //       value: _selectedPlayDuration,
-        //       items: [1, 3, 5, 10].map((value) {
-        //         return DropdownMenuItem<int>(
-        //           value: value,
-        //           child: Text("$value 分"),
-        //         );
-        //       }).toList(),
-        //       onChanged: (newValue) {
-        //         setState(() {
-        //           _selectedPlayDuration = newValue!;
-        //         });
-        //       },
   }
 }
