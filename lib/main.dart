@@ -54,6 +54,7 @@ class _TimerPageState extends State<TimerPage> {
   late AudioPlayer _audioPlayer;
   // int _seconds = 0;
   bool _isRunning = false;
+  bool _isPause = false;
 
   // SEを鳴らす時間の選択肢とデフォルトの設定
   int _selectedPlayDuration = 3; // デフォルトは3分
@@ -103,7 +104,10 @@ class _TimerPageState extends State<TimerPage> {
   void _startTimer() {
     if (_timer == null || !_timer!.isActive) {
       _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-        logger.info('test');
+        logger.info('Timer start');
+        setState(() {
+          _isPause = false;
+        });
         setState(() {
           if (_duration.inSeconds > 0) {
             _duration -= Duration(seconds: 1);
@@ -113,6 +117,7 @@ class _TimerPageState extends State<TimerPage> {
             _timer!.cancel();
             if (_isRunning != false) {
               playAlarmSound(); // タイマーがゼロになったらアラームを再生
+              _isRunning = false;
             }
             else {
               logger.info('Alarm stopped');
@@ -123,8 +128,11 @@ class _TimerPageState extends State<TimerPage> {
       });
     }
     else {
+      logger.info('Timer paused');
+      setState(() {
+        _isPause = true;
+      });
       _timer!.cancel();
-      logger.info('pause');
 
     }
   }
@@ -240,6 +248,7 @@ class _TimerPageState extends State<TimerPage> {
       setState(() {
         _duration = Duration.zero; // 残り時間をゼロにリセット
         _isRunning = false; // タイマーが動いていない状態にリセット
+        _isPause = false;
       });
     }
   }
@@ -270,16 +279,16 @@ class _TimerPageState extends State<TimerPage> {
     // double widthsize_button_position = MediaQuery.of(context).size.width * 0.75;
     double heightsize_button_position = MediaQuery.of(context).size.height * 0.025;
     return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          children: [
-            Center(child: SizedBox(child: Text(
-              'タイマー',
-              style: TextStyle(fontSize: fontSize_title),  // 画面幅に基づいたフォントサイズ
-              ))),
-          ],
-        ),
-      ),
+      // appBar: AppBar(
+      //   title: Column(
+      //     children: [
+      //       Center(child: SizedBox(child: Text(
+      //         'タイマー',
+      //         style: TextStyle(fontSize: fontSize_title),  // 画面幅に基づいたフォントサイズ
+      //         ))),
+      //     ],
+      //   ),
+      // ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -292,100 +301,71 @@ class _TimerPageState extends State<TimerPage> {
               // width: widthsize_button,
               // height: heightsize_button,
             ),
-            IconButton(
-              onPressed: _showTimePicker,
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10), // 角丸の半径
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  onPressed: _showTimePicker,
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10), // 角丸の半径
+                    ),
+                    padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
+                  ),
+                  icon: Icon(Icons.access_alarms),
+                  iconSize: 48.0,
+                  color: Theme.of(context).primaryColor,
                 ),
-                padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
-              ),
-              icon: Icon(Icons.access_alarms),
-              iconSize: 48.0,
-              color: Theme.of(context).primaryColor,
-              // child: SizedBox(
-              //   width: widthsize_button,
-              //   // height: heightsize_button,
-              //   child: Center(
-              //       child: Text(
-              //         '時間を設定',
-              //         style: TextStyle(fontSize: fontSize_timer_button), // 画面幅に基づいたフォントサイズ
-              //       ),
-              //   ),
-              // ),
-            ),
-
-            SizedBox(
-              width: widthsize_button,
-              height: heightsize_button_position,
-              ),
-            IconButton(
-              onPressed: _startTimer,
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10), // 角丸の半径
+                IconButton(
+                  onPressed: _startTimer,
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10), // 角丸の半径
+                    ),
+                    padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
+                  ),
+                  icon: Icon( _timer?.isActive == true && !_isPause ? Icons.pause : Icons.play_arrow),
+                  iconSize: 48.0,
+                  color: Theme.of(context).primaryColor,
                 ),
-                padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
-              ),
-              icon: Icon(_timer!.isActive ? Icons.pause : Icons.play_arrow),
-              iconSize: 48.0,
-              color: Theme.of(context).primaryColor,
-              // child: SizedBox(
-              //   width: widthsize_button,
-              //   // height: heightsize_button,
-              //   child: Center(
-              //     child: Text(
-              //       'タイマー開始',
-              //       style: TextStyle(fontSize: fontSize_timer_button), // 画面幅に基づいたフォントサイズ
-              //     ),
-              //   ),
-              // ),
-            ),
-
-            SizedBox(
-              width: widthsize_button,
-              height: heightsize_button_position * 4,
-              ),
-            // ElevatedButton(
-              IconButton(
-              onPressed: _resetTimer,
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10), // 角丸の半径
+                IconButton(
+                onPressed: _resetTimer,
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10), // 角丸の半径
+                  ),
+                  padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
                 ),
-                padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
-              ),
-              icon: Icon(Icons.stop),
-              iconSize: 48.0,
-              color: Theme.of(context).primaryColor,
-              // child: SizedBox(
-              //   width: widthsize_button,
-              //   // height: heightsize_button,
-              //   child: Center(
-              //     child: Text(
-              //       'タイマー停止',
-              //       style: TextStyle(fontSize: fontSize_timer_button), // 画面幅に基づいたフォントサイズ
-              //     ),
-              //   ),
-              // ),
+                icon: Icon(Icons.stop),
+                iconSize: 48.0,
+                color: Theme.of(context).primaryColor,
+                ),
+              ],
             ),
             SizedBox(height: 20),
             // SE再生時間の選択UI
-            Text("アラーム再生時間を選択", style: TextStyle(fontSize: 18)),
-            DropdownButton<int>(
-              value: _selectedPlayDuration,
-              items: [1, 3, 5, 10].map((value) {
-                return DropdownMenuItem<int>(
-                  value: value,
-                  child: Text("$value 分"),
-                );
-              }).toList(),
-              onChanged: (newValue) {
-                setState(() {
-                  _selectedPlayDuration = newValue!;
-                });
-              },
-            ),
+            // Row(
+            //   children: [
+            //     Text("アラーム再生時間", style: TextStyle(fontSize: 18)),
+            //     SizedBox(width: 20),  // ここで間隔を調整
+            //     SizedBox(width: 8),  // テキストとドロップダウンの間にスペースを入れる
+            //     DropdownButton<int>(
+            //       value: _selectedPlayDuration,
+            //       items: [1, 3, 5].map((value) {
+            //         return DropdownMenuItem<int>(
+            //           value: value,
+            //           child: Text("$value 分"),
+            //         );
+            //       }).toList(),
+            //       onChanged: (newValue) {
+            //         setState(() {
+            //           _selectedPlayDuration = newValue!;
+            //         });
+            //       },
+            //     ),
+            //   ],
+            // )
+
           ],
         ),
       ),
