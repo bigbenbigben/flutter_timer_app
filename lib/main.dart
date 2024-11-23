@@ -303,7 +303,7 @@ class _TimerPageState extends State<TimerPage> {
                 SizedBox(width: 30),
                 // 再生／一時停止ボタン
                 IconButton(
-                  onPressed: _startTimer,
+                  onPressed: (_duration.inSeconds > 0) ? _startTimer : null,
                   style: IconButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10), // 角丸の半径
