@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 
 import 'package:logging/logging.dart';
+import 'package:flutter/foundation.dart';  // kReleaseModeを使うため
 
 // ロガーのインスタンスを作成
 final logger = Logger('MyAppLogger');
@@ -12,7 +13,13 @@ final logger = Logger('MyAppLogger');
 
 void main() {
   // ログレベルを設定
-  Logger.root.level = Level.ALL;  // 出力するログのレベルを設定
+  if (kReleaseMode) {
+    // リリースモードではログを出力しない
+    Logger.root.level = Level.OFF;
+  } else {
+    // デバッグモードではログを出力する
+    Logger.root.level = Level.ALL;
+  }
 
   // ログの出力形式を設定
   Logger.root.onRecord.listen((record) {
