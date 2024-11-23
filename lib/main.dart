@@ -54,6 +54,7 @@ class _TimerPageState extends State<TimerPage> {
   late AudioPlayer _audioPlayer;
   // int _seconds = 0;
   bool _isRunning = false;
+  bool _isPause = false;
 
   // SEを鳴らす時間の選択肢とデフォルトの設定
   int _selectedPlayDuration = 3; // デフォルトは3分
@@ -102,8 +103,10 @@ class _TimerPageState extends State<TimerPage> {
 // タイマーの開始と停止
   void _startTimer() {
     if (_timer == null || !_timer!.isActive) {
+      // _isPause = false;
       _timer = Timer.periodic(Duration(seconds: 1), (timer) {
         logger.info('Timer start');
+         _isPause = false;
         setState(() {
           if (_duration.inSeconds > 0) {
             _duration -= Duration(seconds: 1);
@@ -124,6 +127,9 @@ class _TimerPageState extends State<TimerPage> {
     }
     else {
       _timer!.cancel();
+      setState(() {
+        _isPause = true;
+      });
       logger.info('pause');
 
     }
@@ -304,7 +310,7 @@ class _TimerPageState extends State<TimerPage> {
                     ),
                     padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
                   ),
-                  icon: Icon(Icons.play_arrow),
+                  icon: Icon(!_isPause ? Icons.pause : Icons.play_arrow),
                   iconSize: 48.0,
                   color: Theme.of(context).primaryColor,
                 ),
