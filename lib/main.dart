@@ -18,22 +18,22 @@ void main() {
 
   // ログの出力形式を設定
   Logger.root.onRecord.listen((record) {
-    print('${record.level.name}: ${record.time}: ${record.message}');
+    debugPrint('${record.level.name}: ${record.time}: ${record.message}');
   });
 
   // ログを出力
-  final logger = Logger('MyAppLogger');
+  // final logger = Logger('MyAppLogger');
   logger.info('App started');
 
   // アプリの起動
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
-
 class MyApp extends StatelessWidget {
+  const MyApp({super.key}); // super.key を直接書くだけ！
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: TimerPage(),
     );
   }
@@ -41,6 +41,7 @@ class MyApp extends StatelessWidget {
 
 // タイマー画面を管理、状態管理が必要
 class TimerPage extends StatefulWidget {
+  const TimerPage({super.key}); // super.key を直接書くだけ！
   @override
   _TimerPageState createState() => _TimerPageState();
 }
@@ -50,22 +51,20 @@ class _TimerPageState extends State<TimerPage> {
   Duration _setDuration = const Duration(hours: 0, minutes: 0, seconds: 0);
   Timer? _timer;
 
-  // late Timer _timer;
-  late AudioPlayer _audioPlayer;
-  // int _seconds = 0;
+  final int _selectedPlayDuration = 3; // SEを鳴らす時間、デフォルトは3分
+
+  // 各種状態切替
   bool _isRunning = false;
   bool _isPause = false;
   bool _isAlarm = false;
 
-  // SEを鳴らす時間の選択肢とデフォルトの設定
-  int _selectedPlayDuration = 3; // デフォルトは3分
+  late AudioPlayer _audioPlayer;  // SE再生用
 
 // 初期化処理
   @override
   void initState() {
     super.initState();
     _audioPlayer = AudioPlayer();
-    // _audioPlayer.setPlayerMode(PlayerMode.lowLatency);
   }
 
   @override
@@ -82,13 +81,13 @@ class _TimerPageState extends State<TimerPage> {
       while (elapsed < playDuration) {
         _audioPlayer.seek(Duration.zero);
         await _audioPlayer.play(AssetSource('sounds/se.mp3'));
-        await Future.delayed(Duration(seconds: 3)); // 再生が終わるまで待機
+        await Future.delayed(const Duration(seconds: 3)); // 再生が終わるまで待機
         if (!_isRunning) break;
         elapsed += 3;
       }
       await _audioPlayer.stop(); // 最終的に完全停止
     } catch (e) {
-      print('Error playing audio: $e');
+      logger.info('Error playing audio: $e');
     }
   }
 
@@ -105,12 +104,12 @@ class _TimerPageState extends State<TimerPage> {
   void _startTimer() {
     if (_timer == null || !_timer!.isActive) {
       // _isPause = false;
-      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-        logger.info('Timer start');
-         _isPause = false;
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        logger.info('Timer started');
+        _isPause = false;
         setState(() {
           if (_duration.inSeconds > 0) {
-            _duration -= Duration(seconds: 1);
+            _duration -= const Duration(seconds: 1);
             _isRunning = true;
           } else {
             logger.info('Timer paused');
@@ -140,14 +139,13 @@ class _TimerPageState extends State<TimerPage> {
 // タイマー設定のUI
   void _showTimePicker() {
     Duration tempDuration = _setDuration; // 選択した時間を一時保存
-    // tempDuration = _duration;
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         return Column(
           children: [
             Container(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -158,12 +156,12 @@ class _TimerPageState extends State<TimerPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                     ),
-                    child: Text('キャンセル'),
+                    child: const Text('キャンセル'),
                   ),
                   // タイトル
-                  Center(
+                  const Center(
                     child: Text(
                       'タイマー設定',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -188,8 +186,7 @@ class _TimerPageState extends State<TimerPage> {
                             logger.info('Duration set');
                           _duration = tempDuration;
                           _setDuration = tempDuration;
-                          if (_duration.inSeconds > 0)
-                            _isPause = true;
+                          if (_duration.inSeconds > 0) _isPause = true;
                           });
                         // }
                         // else if (_timer == null || !_timer!.isActive) {
@@ -213,14 +210,14 @@ class _TimerPageState extends State<TimerPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                     ),
-                    child: Text('OK'),
+                    child: const Text('OK'),
                   ),
                 ],
               ),
             ),
-            Divider(),
+            const Divider(),
             // ダイアル
             Expanded(
               child: Container(
@@ -277,7 +274,7 @@ class _TimerPageState extends State<TimerPage> {
     // double heightsize_button = MediaQuery.of(context).size.height * 0.10;
     // ボタン配置
     // double widthsize_button_position = MediaQuery.of(context).size.width * 0.75;
-    double heightsize_button_position = MediaQuery.of(context).size.height * 0.025;
+    // double heightsize_button_position = MediaQuery.of(context).size.height * 0.025;
     return Scaffold(
       body: Center(
         child: Column(
