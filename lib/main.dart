@@ -130,8 +130,7 @@ class _TimerPageState extends State<TimerPage> {
       setState(() {
         _isPause = true;
       });
-      logger.info('pause');
-
+      logger.info('time pause');
     }
   }
 
