@@ -115,6 +115,7 @@ class _TimerPageState extends State<TimerPage> {
             logger.info('Timer paused');
             _timer!.cancel();
             if (_isRunning != false) {
+              logger.info('Alarm started');
               playAlarmSound(); // タイマーがゼロになったらアラームを再生
             }
             else {
