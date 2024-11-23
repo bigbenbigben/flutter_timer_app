@@ -106,8 +106,8 @@ class _TimerPageState extends State<TimerPage> {
       // _isPause = false;
       _timer = Timer.periodic(Duration(seconds: 1), (timer) {
         logger.info('Timer start');
-         _isPause = false;
         setState(() {
+          _isPause = false;
           if (_duration.inSeconds > 0) {
             _duration -= Duration(seconds: 1);
             _isRunning = true;
