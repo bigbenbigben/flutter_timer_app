@@ -1,125 +1,341 @@
+// import 'dart:ffi';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
+
+import 'package:logging/logging.dart';
+
+// ロガーのインスタンスを作成
+final logger = Logger('MyAppLogger');
+
+// void main() => runApp(MyApp());
 
 void main() {
-  runApp(const MyApp());
+  // ログレベルを設定
+  Logger.root.level = Level.ALL;  // 出力するログのレベルを設定
+
+  // ログの出力形式を設定
+  Logger.root.onRecord.listen((record) {
+    print('${record.level.name}: ${record.time}: ${record.message}');
+  });
+
+  // ログを出力
+  final logger = Logger('MyAppLogger');
+  logger.info('App started');
+
+  // アプリの起動
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
 
-  // This widget is the root of your application.
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: TimerPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
+// タイマー画面を管理、状態管理が必要
+class TimerPage extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _TimerPageState createState() => _TimerPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _TimerPageState extends State<TimerPage> {
+  Duration _duration = const Duration(hours: 0, minutes: 0, seconds: 0);
+  Duration _setDuration = const Duration(hours: 0, minutes: 0, seconds: 0);
+  Timer? _timer;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  // late Timer _timer;
+  late AudioPlayer _audioPlayer;
+  // int _seconds = 0;
+  bool _isRunning = false;
+  bool _isPause = false;
+  bool _isAlarm = false;
+
+  // SEを鳴らす時間の選択肢とデフォルトの設定
+  int _selectedPlayDuration = 3; // デフォルトは3分
+
+// 初期化処理
+  @override
+  void initState() {
+    super.initState();
+    _audioPlayer = AudioPlayer();
+    // _audioPlayer.setPlayerMode(PlayerMode.lowLatency);
   }
 
   @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
+// アラーム音の再生
+  Future<void> playAlarmSound() async {
+    try {
+      int playDuration = _selectedPlayDuration * 60; // 秒単位に変換
+      int elapsed = 0;
+      while (elapsed < playDuration) {
+        _audioPlayer.seek(Duration.zero);
+        await _audioPlayer.play(AssetSource('sounds/se.mp3'));
+        await Future.delayed(Duration(seconds: 3)); // 再生が終わるまで待機
+        if (!_isRunning) break;
+        elapsed += 3;
+      }
+      await _audioPlayer.stop(); // 最終的に完全停止
+    } catch (e) {
+      print('Error playing audio: $e');
+    }
+  }
+
+// アラーム音の停止
+  Future<void> stopAlarmSound() async {
+    await _audioPlayer.stop();
+    setState(() {
+      _isAlarm = false;
+    });
+
+  }
+
+// タイマーの開始と停止
+  void _startTimer() {
+    if (_timer == null || !_timer!.isActive) {
+      // _isPause = false;
+      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+        logger.info('Timer start');
+         _isPause = false;
+        setState(() {
+          if (_duration.inSeconds > 0) {
+            _duration -= Duration(seconds: 1);
+            _isRunning = true;
+          } else {
+            logger.info('Timer paused');
+            _timer!.cancel();
+            if (_isRunning != false) {
+              logger.info('Alarm started');
+              _isAlarm = true;
+              playAlarmSound(); // タイマーがゼロになったらアラームを再生
+            }
+            else {
+              logger.info('Alarm stopped');
+              stopAlarmSound();
+            }
+          }
+        });
+      });
+    }
+    else {
+      _timer!.cancel();
+      setState(() {
+        _isPause = true;
+      });
+      logger.info('time paused');
+    }
+  }
+
+// タイマー設定のUI
+  void _showTimePicker() {
+    Duration tempDuration = _setDuration; // 選択した時間を一時保存
+    // tempDuration = _duration;
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Column(
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // キャンセルボタン
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                    ),
+                    child: Text('キャンセル'),
+                  ),
+                  // タイトル
+                  Center(
+                    child: Text(
+                      'タイマー設定',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  // OKボタン
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_setDuration.inHours < 0 ||
+                          _setDuration.inMinutes < 0 ||
+                          _setDuration.inSeconds < 0) {
+                        _setDuration = const Duration(hours: 0, minutes: 0, seconds: 0);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            // content: Text('不正な値が設定されました'),
+                            content: Text('Value: ${_setDuration.inMinutes}'),
+                          ),
+                        );
+                      } else {
+                        // if (_isRunning != true){
+                        setState(() {
+                            logger.info('Duration set');
+                          _duration = tempDuration;
+                          _setDuration = tempDuration;
+                          if (_duration.inSeconds > 0)
+                            _isPause = true;
+                          });
+                        // }
+                        // else if (_timer == null || !_timer!.isActive) {
+                        //   setState(() {
+                        //     logger.info('Duration check');
+                        //     logger.info('Duration: ${_duration.inHours} hours, ${_duration.inMinutes % 60} minutes, ${_duration.inSeconds % 60} seconds');
+                        //     _duration = tempDuration;
+                        //     _setDuration = tempDuration;
+                        //   });
+                        // } else {
+                        //   setState(() {
+                        //     logger.info('Duration active');
+                        //     _duration = tempDuration;
+                        //     _setDuration = tempDuration;
+                        //   });
+                        // }
+                        Navigator.pop(context);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                    ),
+                    child: Text('OK'),
+                  ),
+                ],
+              ),
+            ),
+            Divider(),
+            // ダイアル
+            Expanded(
+              child: Container(
+                width: MediaQuery.of(context).size.width, // 画面いっぱいの幅
+                height: MediaQuery.of(context).size.height * 0.5, // 画面高さの50%を指定
+                child: CupertinoTimerPicker(
+                  initialTimerDuration: _setDuration,
+                  mode: CupertinoTimerPickerMode.hms,
+                  onTimerDurationChanged: (Duration newDuration) {
+                    tempDuration = newDuration;
+                  },
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _resetTimer() {
+    if (_timer != null && !_timer!.isActive) {
+      _timer!.cancel(); // タイマーをキャンセル
+      stopAlarmSound();
+      logger.info('reset timer');
+      setState(() {
+        _duration = Duration.zero; // 残り時間をゼロにリセット
+        _isRunning = false; // タイマーが動いていない状態にリセット
+      });
+    }
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String hours = twoDigits(duration.inHours);
+    String minutes = twoDigits(duration.inMinutes.remainder(60));
+    String seconds = twoDigits(duration.inSeconds.remainder(60));
+    return "$hours:$minutes:$seconds";
+  }
+
+// UIレイアウト
+  @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    // 画面に合わせたフォントサイズ
+    // タイトル
+    double fontSize_title = MediaQuery.of(context).size.width * 0.15;
+    // タイマー
+    double fontSize_timer = MediaQuery.of(context).size.width * 0.20;
+    // ボタン
+    double fontSize_timer_button = MediaQuery.of(context).size.width * 0.10;
+    // 画面に合わせた配置
+    // ボタン幅と高さ
+    double widthsize_button = MediaQuery.of(context).size.width * 0.75;
+    // double heightsize_button = MediaQuery.of(context).size.height * 0.10;
+    // ボタン配置
+    // double widthsize_button_position = MediaQuery.of(context).size.width * 0.75;
+    double heightsize_button_position = MediaQuery.of(context).size.height * 0.025;
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
             Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+              _formatDuration(_duration),
+              style: TextStyle(fontSize: fontSize_timer),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // 設定ボタン
+                IconButton(
+                  onPressed: _timer?.isActive != true && !_isAlarm ? _showTimePicker : null,
+                  style: IconButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10), // 角丸の半径
+                    ),
+                    padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
+                  ),
+                  icon: Icon(Icons.access_alarms),
+                  iconSize: 48.0,
+                  color: Theme.of(context).primaryColor,
+                ),
+                SizedBox(width: 30),
+                // 再生／一時停止ボタン
+                IconButton(
+                  onPressed: (_duration.inSeconds > 0) ? _startTimer : null,
+                  style: IconButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10), // 角丸の半径
+                    ),
+                    padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
+                  ),
+                  icon: Icon(!_isPause ? Icons.pause : Icons.play_arrow),
+                  iconSize: 48.0,
+                  color: Theme.of(context).primaryColor,
+                ),
+                SizedBox(width: 30),
+                // 停止／リセットボタン
+                IconButton(
+                  onPressed: _isAlarm || ((_duration.inSeconds > 0) && _isPause)  ? _resetTimer : null,
+                  style: IconButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10), // 角丸の半径
+                    ),
+                    padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
+                  ),
+                  icon: Icon(_isPause || (_duration.inSeconds > 0) ? Icons.refresh : Icons.stop),
+                  iconSize: 48.0,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ],
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
