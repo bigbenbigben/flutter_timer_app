@@ -270,16 +270,6 @@ class _TimerPageState extends State<TimerPage> {
     // double widthsize_button_position = MediaQuery.of(context).size.width * 0.75;
     double heightsize_button_position = MediaQuery.of(context).size.height * 0.025;
     return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          children: [
-            Center(child: SizedBox(child: Text(
-              'タイマー',
-              style: TextStyle(fontSize: fontSize_title),  // 画面幅に基づいたフォントサイズ
-              ))),
-          ],
-        ),
-      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
