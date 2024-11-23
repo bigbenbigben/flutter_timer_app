@@ -1,5 +1,3 @@
-// import 'dart:ffi';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -18,22 +16,22 @@ void main() {
 
   // ログの出力形式を設定
   Logger.root.onRecord.listen((record) {
-    print('${record.level.name}: ${record.time}: ${record.message}');
+    debugPrint('${record.level.name}: ${record.time}: ${record.message}');
   });
 
   // ログを出力
-  final logger = Logger('MyAppLogger');
+  // final logger = Logger('MyAppLogger');
   logger.info('App started');
 
   // アプリの起動
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
-
 class MyApp extends StatelessWidget {
+  const MyApp({super.key}); // super.key を直接書くだけ！
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: TimerPage(),
     );
   }
@@ -41,6 +39,7 @@ class MyApp extends StatelessWidget {
 
 // タイマー画面を管理、状態管理が必要
 class TimerPage extends StatefulWidget {
+  const TimerPage({super.key}); // super.key を直接書くだけ！
   @override
   _TimerPageState createState() => _TimerPageState();
 }
@@ -50,22 +49,20 @@ class _TimerPageState extends State<TimerPage> {
   Duration _setDuration = const Duration(hours: 0, minutes: 0, seconds: 0);
   Timer? _timer;
 
-  // late Timer _timer;
-  late AudioPlayer _audioPlayer;
-  // int _seconds = 0;
+  final int _selectedPlayDuration = 3; // SEを鳴らす時間、デフォルトは3分
+
+  // 各種状態切替
   bool _isRunning = false;
   bool _isPause = false;
   bool _isAlarm = false;
 
-  // SEを鳴らす時間の選択肢とデフォルトの設定
-  int _selectedPlayDuration = 3; // デフォルトは3分
+  late AudioPlayer _audioPlayer;  // SE再生用
 
 // 初期化処理
   @override
   void initState() {
     super.initState();
     _audioPlayer = AudioPlayer();
-    // _audioPlayer.setPlayerMode(PlayerMode.lowLatency);
   }
 
   @override
@@ -82,13 +79,13 @@ class _TimerPageState extends State<TimerPage> {
       while (elapsed < playDuration) {
         _audioPlayer.seek(Duration.zero);
         await _audioPlayer.play(AssetSource('sounds/se.mp3'));
-        await Future.delayed(Duration(seconds: 3)); // 再生が終わるまで待機
+        await Future.delayed(const Duration(seconds: 3)); // 再生が終わるまで待機
         if (!_isRunning) break;
         elapsed += 3;
       }
       await _audioPlayer.stop(); // 最終的に完全停止
     } catch (e) {
-      print('Error playing audio: $e');
+      logger.info('Error playing audio: $e');
     }
   }
 
@@ -105,12 +102,12 @@ class _TimerPageState extends State<TimerPage> {
   void _startTimer() {
     if (_timer == null || !_timer!.isActive) {
       // _isPause = false;
-      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-        logger.info('Timer start');
-         _isPause = false;
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        logger.info('Timer started');
+        _isPause = false;
         setState(() {
           if (_duration.inSeconds > 0) {
-            _duration -= Duration(seconds: 1);
+            _duration -= const Duration(seconds: 1);
             _isRunning = true;
           } else {
             logger.info('Timer paused');
@@ -133,21 +130,20 @@ class _TimerPageState extends State<TimerPage> {
       setState(() {
         _isPause = true;
       });
-      logger.info('time paused');
+      logger.info('Timer paused');
     }
   }
 
 // タイマー設定のUI
   void _showTimePicker() {
     Duration tempDuration = _setDuration; // 選択した時間を一時保存
-    // tempDuration = _duration;
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         return Column(
           children: [
             Container(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -158,12 +154,12 @@ class _TimerPageState extends State<TimerPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                     ),
-                    child: Text('キャンセル'),
+                    child: const Text('キャンセル'),
                   ),
                   // タイトル
-                  Center(
+                  const Center(
                     child: Text(
                       'タイマー設定',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -178,34 +174,16 @@ class _TimerPageState extends State<TimerPage> {
                         _setDuration = const Duration(hours: 0, minutes: 0, seconds: 0);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            // content: Text('不正な値が設定されました'),
                             content: Text('Value: ${_setDuration.inMinutes}'),
                           ),
                         );
                       } else {
-                        // if (_isRunning != true){
                         setState(() {
-                            logger.info('Duration set');
+                            logger.info('Setting Duration');
                           _duration = tempDuration;
                           _setDuration = tempDuration;
-                          if (_duration.inSeconds > 0)
-                            _isPause = true;
+                          if (_duration.inSeconds > 0) _isPause = true;
                           });
-                        // }
-                        // else if (_timer == null || !_timer!.isActive) {
-                        //   setState(() {
-                        //     logger.info('Duration check');
-                        //     logger.info('Duration: ${_duration.inHours} hours, ${_duration.inMinutes % 60} minutes, ${_duration.inSeconds % 60} seconds');
-                        //     _duration = tempDuration;
-                        //     _setDuration = tempDuration;
-                        //   });
-                        // } else {
-                        //   setState(() {
-                        //     logger.info('Duration active');
-                        //     _duration = tempDuration;
-                        //     _setDuration = tempDuration;
-                        //   });
-                        // }
                         Navigator.pop(context);
                       }
                     },
@@ -213,19 +191,17 @@ class _TimerPageState extends State<TimerPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                     ),
-                    child: Text('OK'),
+                    child: const Text('OK'),
                   ),
                 ],
               ),
             ),
-            Divider(),
+            const Divider(),
             // ダイアル
             Expanded(
-              child: Container(
-                width: MediaQuery.of(context).size.width, // 画面いっぱいの幅
-                height: MediaQuery.of(context).size.height * 0.5, // 画面高さの50%を指定
+              child: SizedBox(
                 child: CupertinoTimerPicker(
                   initialTimerDuration: _setDuration,
                   mode: CupertinoTimerPickerMode.hms,
@@ -245,7 +221,7 @@ class _TimerPageState extends State<TimerPage> {
     if (_timer != null && !_timer!.isActive) {
       _timer!.cancel(); // タイマーをキャンセル
       stopAlarmSound();
-      logger.info('reset timer');
+      logger.info('Resetted timer');
       setState(() {
         _duration = Duration.zero; // 残り時間をゼロにリセット
         _isRunning = false; // タイマーが動いていない状態にリセット
@@ -264,20 +240,12 @@ class _TimerPageState extends State<TimerPage> {
 // UIレイアウト
   @override
   Widget build(BuildContext context) {
-    // 画面に合わせたフォントサイズ
-    // タイトル
-    double fontSize_title = MediaQuery.of(context).size.width * 0.15;
-    // タイマー
-    double fontSize_timer = MediaQuery.of(context).size.width * 0.20;
-    // ボタン
-    double fontSize_timer_button = MediaQuery.of(context).size.width * 0.10;
-    // 画面に合わせた配置
-    // ボタン幅と高さ
-    double widthsize_button = MediaQuery.of(context).size.width * 0.75;
-    // double heightsize_button = MediaQuery.of(context).size.height * 0.10;
-    // ボタン配置
-    // double widthsize_button_position = MediaQuery.of(context).size.width * 0.75;
-    double heightsize_button_position = MediaQuery.of(context).size.height * 0.025;
+    // 画面幅によって変わる要素
+    double screenWidth = MediaQuery.of(context).size.width; // 画面幅
+    double timerFontSize = screenWidth * 0.20;              // タイマーの数字のフォントサイズ
+    double buttonIconSize = screenWidth * 0.15;             // ボタン
+    double buttonSpacing = screenWidth * 0.05;              // ボタンの間隔
+
     return Scaffold(
       body: Center(
         child: Column(
@@ -285,7 +253,7 @@ class _TimerPageState extends State<TimerPage> {
           children: <Widget>[
             Text(
               _formatDuration(_duration),
-              style: TextStyle(fontSize: fontSize_timer),
+              style: TextStyle(fontSize: timerFontSize),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -297,13 +265,13 @@ class _TimerPageState extends State<TimerPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10), // 角丸の半径
                     ),
-                    padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
+                    padding: const EdgeInsets.all(3.0), // ボタン全体の余白を設定
                   ),
-                  icon: Icon(Icons.access_alarms),
-                  iconSize: 48.0,
+                  icon: const Icon(Icons.access_alarms),
+                  iconSize: buttonIconSize,
                   color: Theme.of(context).primaryColor,
                 ),
-                SizedBox(width: 30),
+                SizedBox(width: buttonSpacing),
                 // 再生／一時停止ボタン
                 IconButton(
                   onPressed: (_duration.inSeconds > 0) ? _startTimer : null,
@@ -311,13 +279,13 @@ class _TimerPageState extends State<TimerPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10), // 角丸の半径
                     ),
-                    padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
+                    padding: const EdgeInsets.all(3.0), // ボタン全体の余白を設定
                   ),
                   icon: Icon(!_isPause ? Icons.pause : Icons.play_arrow),
-                  iconSize: 48.0,
+                  iconSize: buttonIconSize,
                   color: Theme.of(context).primaryColor,
                 ),
-                SizedBox(width: 30),
+                SizedBox(width: buttonSpacing),
                 // 停止／リセットボタン
                 IconButton(
                   onPressed: _isAlarm || ((_duration.inSeconds > 0) && _isPause)  ? _resetTimer : null,
@@ -325,10 +293,10 @@ class _TimerPageState extends State<TimerPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10), // 角丸の半径
                     ),
-                    padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
+                    padding: const EdgeInsets.all(3.0), // ボタン全体の余白を設定
                   ),
                   icon: Icon(_isPause || (_duration.inSeconds > 0) ? Icons.refresh : Icons.stop),
-                  iconSize: 48.0,
+                  iconSize: buttonIconSize,
                   color: Theme.of(context).primaryColor,
                 ),
               ],
