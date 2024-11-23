@@ -1,5 +1,3 @@
-// import 'dart:ffi';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -132,7 +130,7 @@ class _TimerPageState extends State<TimerPage> {
       setState(() {
         _isPause = true;
       });
-      logger.info('time paused');
+      logger.info('Timer paused');
     }
   }
 
@@ -176,33 +174,16 @@ class _TimerPageState extends State<TimerPage> {
                         _setDuration = const Duration(hours: 0, minutes: 0, seconds: 0);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            // content: Text('不正な値が設定されました'),
                             content: Text('Value: ${_setDuration.inMinutes}'),
                           ),
                         );
                       } else {
-                        // if (_isRunning != true){
                         setState(() {
-                            logger.info('Duration set');
+                            logger.info('Setting Duration');
                           _duration = tempDuration;
                           _setDuration = tempDuration;
                           if (_duration.inSeconds > 0) _isPause = true;
                           });
-                        // }
-                        // else if (_timer == null || !_timer!.isActive) {
-                        //   setState(() {
-                        //     logger.info('Duration check');
-                        //     logger.info('Duration: ${_duration.inHours} hours, ${_duration.inMinutes % 60} minutes, ${_duration.inSeconds % 60} seconds');
-                        //     _duration = tempDuration;
-                        //     _setDuration = tempDuration;
-                        //   });
-                        // } else {
-                        //   setState(() {
-                        //     logger.info('Duration active');
-                        //     _duration = tempDuration;
-                        //     _setDuration = tempDuration;
-                        //   });
-                        // }
                         Navigator.pop(context);
                       }
                     },
@@ -240,7 +221,7 @@ class _TimerPageState extends State<TimerPage> {
     if (_timer != null && !_timer!.isActive) {
       _timer!.cancel(); // タイマーをキャンセル
       stopAlarmSound();
-      logger.info('resetted timer');
+      logger.info('Resetted timer');
       setState(() {
         _duration = Duration.zero; // 残り時間をゼロにリセット
         _isRunning = false; // タイマーが動いていない状態にリセット
@@ -259,20 +240,12 @@ class _TimerPageState extends State<TimerPage> {
 // UIレイアウト
   @override
   Widget build(BuildContext context) {
-    // 画面に合わせたフォントサイズ
-    // タイトル
-    // double fontSize_title = MediaQuery.of(context).size.width * 0.15;
-    // タイマーの数字のフォントサイズ
-    double fontSizeTimer = MediaQuery.of(context).size.width * 0.20;
-    // ボタン
-    // double fontSize_timer_button = MediaQuery.of(context).size.width * 0.10;
-    // 画面に合わせた配置
-    // ボタン幅と高さ
-    // double widthsize_button = MediaQuery.of(context).size.width * 0.75;
-    // double heightsize_button = MediaQuery.of(context).size.height * 0.10;
-    // ボタン配置
-    // double widthsize_button_position = MediaQuery.of(context).size.width * 0.75;
-    // double heightsize_button_position = MediaQuery.of(context).size.height * 0.025;
+    // 画面幅によって変わる要素
+    double screenWidth = MediaQuery.of(context).size.width; // 画面幅
+    double timerFontSize = screenWidth * 0.20;              // タイマーの数字のフォントサイズ
+    double buttonIconSize = screenWidth * 0.15;             // ボタン
+    double buttonSpacing = screenWidth * 0.05;              // ボタンの間隔
+
     return Scaffold(
       body: Center(
         child: Column(
@@ -280,7 +253,7 @@ class _TimerPageState extends State<TimerPage> {
           children: <Widget>[
             Text(
               _formatDuration(_duration),
-              style: TextStyle(fontSize: fontSizeTimer),
+              style: TextStyle(fontSize: timerFontSize),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -295,10 +268,10 @@ class _TimerPageState extends State<TimerPage> {
                     padding: const EdgeInsets.all(3.0), // ボタン全体の余白を設定
                   ),
                   icon: const Icon(Icons.access_alarms),
-                  iconSize: 48.0,
+                  iconSize: buttonIconSize,
                   color: Theme.of(context).primaryColor,
                 ),
-                const SizedBox(width: 30),
+                SizedBox(width: buttonSpacing),
                 // 再生／一時停止ボタン
                 IconButton(
                   onPressed: (_duration.inSeconds > 0) ? _startTimer : null,
@@ -309,10 +282,10 @@ class _TimerPageState extends State<TimerPage> {
                     padding: const EdgeInsets.all(3.0), // ボタン全体の余白を設定
                   ),
                   icon: Icon(!_isPause ? Icons.pause : Icons.play_arrow),
-                  iconSize: 48.0,
+                  iconSize: buttonIconSize,
                   color: Theme.of(context).primaryColor,
                 ),
-                const SizedBox(width: 30),
+                SizedBox(width: buttonSpacing),
                 // 停止／リセットボタン
                 IconButton(
                   onPressed: _isAlarm || ((_duration.inSeconds > 0) && _isPause)  ? _resetTimer : null,
@@ -323,7 +296,7 @@ class _TimerPageState extends State<TimerPage> {
                     padding: const EdgeInsets.all(3.0), // ボタン全体の余白を設定
                   ),
                   icon: Icon(_isPause || (_duration.inSeconds > 0) ? Icons.refresh : Icons.stop),
-                  iconSize: 48.0,
+                  iconSize: buttonIconSize,
                   color: Theme.of(context).primaryColor,
                 ),
               ],
