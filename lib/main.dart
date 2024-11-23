@@ -220,9 +220,7 @@ class _TimerPageState extends State<TimerPage> {
             const Divider(),
             // ダイアル
             Expanded(
-              child: Container(
-                width: MediaQuery.of(context).size.width, // 画面いっぱいの幅
-                height: MediaQuery.of(context).size.height * 0.5, // 画面高さの50%を指定
+              child: SizedBox(
                 child: CupertinoTimerPicker(
                   initialTimerDuration: _setDuration,
                   mode: CupertinoTimerPickerMode.hms,
@@ -242,7 +240,7 @@ class _TimerPageState extends State<TimerPage> {
     if (_timer != null && !_timer!.isActive) {
       _timer!.cancel(); // タイマーをキャンセル
       stopAlarmSound();
-      logger.info('reset timer');
+      logger.info('resetted timer');
       setState(() {
         _duration = Duration.zero; // 残り時間をゼロにリセット
         _isRunning = false; // タイマーが動いていない状態にリセット
@@ -263,14 +261,14 @@ class _TimerPageState extends State<TimerPage> {
   Widget build(BuildContext context) {
     // 画面に合わせたフォントサイズ
     // タイトル
-    double fontSize_title = MediaQuery.of(context).size.width * 0.15;
-    // タイマー
-    double fontSize_timer = MediaQuery.of(context).size.width * 0.20;
+    // double fontSize_title = MediaQuery.of(context).size.width * 0.15;
+    // タイマーの数字のフォントサイズ
+    double fontSizeTimer = MediaQuery.of(context).size.width * 0.20;
     // ボタン
-    double fontSize_timer_button = MediaQuery.of(context).size.width * 0.10;
+    // double fontSize_timer_button = MediaQuery.of(context).size.width * 0.10;
     // 画面に合わせた配置
     // ボタン幅と高さ
-    double widthsize_button = MediaQuery.of(context).size.width * 0.75;
+    // double widthsize_button = MediaQuery.of(context).size.width * 0.75;
     // double heightsize_button = MediaQuery.of(context).size.height * 0.10;
     // ボタン配置
     // double widthsize_button_position = MediaQuery.of(context).size.width * 0.75;
@@ -282,7 +280,7 @@ class _TimerPageState extends State<TimerPage> {
           children: <Widget>[
             Text(
               _formatDuration(_duration),
-              style: TextStyle(fontSize: fontSize_timer),
+              style: TextStyle(fontSize: fontSizeTimer),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -294,13 +292,13 @@ class _TimerPageState extends State<TimerPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10), // 角丸の半径
                     ),
-                    padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
+                    padding: const EdgeInsets.all(3.0), // ボタン全体の余白を設定
                   ),
-                  icon: Icon(Icons.access_alarms),
+                  icon: const Icon(Icons.access_alarms),
                   iconSize: 48.0,
                   color: Theme.of(context).primaryColor,
                 ),
-                SizedBox(width: 30),
+                const SizedBox(width: 30),
                 // 再生／一時停止ボタン
                 IconButton(
                   onPressed: (_duration.inSeconds > 0) ? _startTimer : null,
@@ -308,13 +306,13 @@ class _TimerPageState extends State<TimerPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10), // 角丸の半径
                     ),
-                    padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
+                    padding: const EdgeInsets.all(3.0), // ボタン全体の余白を設定
                   ),
                   icon: Icon(!_isPause ? Icons.pause : Icons.play_arrow),
                   iconSize: 48.0,
                   color: Theme.of(context).primaryColor,
                 ),
-                SizedBox(width: 30),
+                const SizedBox(width: 30),
                 // 停止／リセットボタン
                 IconButton(
                   onPressed: _isAlarm || ((_duration.inSeconds > 0) && _isPause)  ? _resetTimer : null,
@@ -322,7 +320,7 @@ class _TimerPageState extends State<TimerPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10), // 角丸の半径
                     ),
-                    padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
+                    padding: const EdgeInsets.all(3.0), // ボタン全体の余白を設定
                   ),
                   icon: Icon(_isPause || (_duration.inSeconds > 0) ? Icons.refresh : Icons.stop),
                   iconSize: 48.0,
