@@ -324,7 +324,7 @@ class _TimerPageState extends State<TimerPage> {
                     ),
                     padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
                   ),
-                  icon: Icon(Icons.stop),
+                  icon: Icon(_isPause || (_duration.inSeconds > 0) ? Icons.refresh : Icons.stop),
                   iconSize: 48.0,
                   color: Theme.of(context).primaryColor,
                 ),
