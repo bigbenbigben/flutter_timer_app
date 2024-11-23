@@ -327,7 +327,7 @@ class _TimerPageState extends State<TimerPage> {
                 ),
                 padding: EdgeInsets.all(3.0), // ボタン全体の余白を設定
               ),
-              icon: Icon(_timer!.isActive ? Icons.pause : Icons.play_arrow),
+              icon: Icon(Icons.play_arrow),
               iconSize: 48.0,
               color: Theme.of(context).primaryColor,
               // child: SizedBox(
@@ -369,23 +369,23 @@ class _TimerPageState extends State<TimerPage> {
               //   ),
               // ),
             ),
-            SizedBox(height: 20),
-            // SE再生時間の選択UI
-            Text("アラーム再生時間を選択", style: TextStyle(fontSize: 18)),
-            DropdownButton<int>(
-              value: _selectedPlayDuration,
-              items: [1, 3, 5, 10].map((value) {
-                return DropdownMenuItem<int>(
-                  value: value,
-                  child: Text("$value 分"),
-                );
-              }).toList(),
-              onChanged: (newValue) {
-                setState(() {
-                  _selectedPlayDuration = newValue!;
-                });
-              },
-            ),
+            // SizedBox(height: 20),
+            // // SE再生時間の選択UI
+            // Text("アラーム再生時間を選択", style: TextStyle(fontSize: 18)),
+            // DropdownButton<int>(
+            //   value: _selectedPlayDuration,
+            //   items: [1, 3, 5, 10].map((value) {
+            //     return DropdownMenuItem<int>(
+            //       value: value,
+            //       child: Text("$value 分"),
+            //     );
+            //   }).toList(),
+            //   onChanged: (newValue) {
+            //     setState(() {
+            //       _selectedPlayDuration = newValue!;
+            //     });
+            //   },
+            // ),
           ],
         ),
       ),
