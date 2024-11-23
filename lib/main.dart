@@ -85,7 +85,7 @@ class _TimerPageState extends State<TimerPage> {
         _audioPlayer.seek(Duration.zero);
         await _audioPlayer.play(AssetSource('sounds/se.mp3'));
         await Future.delayed(Duration(seconds: 3)); // 再生が終わるまで待機
-        if (!_isRunning) break;
+        // if (!_isRunning) break;
         elapsed += 3;
       }
       await _audioPlayer.stop(); // 最終的に完全停止
@@ -116,8 +116,9 @@ class _TimerPageState extends State<TimerPage> {
             logger.info('Timer paused');
             _timer!.cancel();
             if (_isRunning != false) {
+              logger.info('Timer zero count');
               playAlarmSound(); // タイマーがゼロになったらアラームを再生
-              _isRunning = false;
+              // _isRunning = false;
             }
             else {
               logger.info('Alarm stopped');
@@ -129,9 +130,9 @@ class _TimerPageState extends State<TimerPage> {
     }
     else {
       logger.info('Timer paused');
-      setState(() {
-        _isPause = true;
-      });
+      // setState(() {
+      //   _isPause = true;
+      // });
       _timer!.cancel();
 
     }
@@ -243,12 +244,13 @@ class _TimerPageState extends State<TimerPage> {
   void _resetTimer() {
     if (_timer != null && !_timer!.isActive) {
       _timer!.cancel(); // タイマーをキャンセル
+      _isRunning = false; // タイマーが動いていない状態にリセット
+      _isPause = false;
       stopAlarmSound();
       logger.info('reset timer');
       setState(() {
         _duration = Duration.zero; // 残り時間をゼロにリセット
-        _isRunning = false; // タイマーが動いていない状態にリセット
-        _isPause = false;
+
       });
     }
   }
