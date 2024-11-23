@@ -315,7 +315,7 @@ class _TimerPageState extends State<TimerPage> {
                   color: Theme.of(context).primaryColor,
                 ),
                 SizedBox(width: 30),
-                // 停止ボタン
+                // 停止／リセットボタン
                 IconButton(
                   onPressed: _resetTimer,
                   style: IconButton.styleFrom(
