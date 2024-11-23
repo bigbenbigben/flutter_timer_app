@@ -278,13 +278,10 @@ class _TimerPageState extends State<TimerPage> {
               _formatDuration(_duration),
               style: TextStyle(fontSize: fontSize_timer),
             ),
-            SizedBox(
-              // width: widthsize_button,
-              // height: heightsize_button,
-            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // 設定ボタン
                 IconButton(
                   onPressed: _showTimePicker,
                   style: IconButton.styleFrom(
@@ -298,6 +295,7 @@ class _TimerPageState extends State<TimerPage> {
                   color: Theme.of(context).primaryColor,
                 ),
                 SizedBox(width: 30),
+                // 再生／一時停止ボタン
                 IconButton(
                   onPressed: _startTimer,
                   style: IconButton.styleFrom(
@@ -311,6 +309,7 @@ class _TimerPageState extends State<TimerPage> {
                   color: Theme.of(context).primaryColor,
                 ),
                 SizedBox(width: 30),
+                // 停止ボタン
                 IconButton(
                   onPressed: _resetTimer,
                   style: IconButton.styleFrom(
