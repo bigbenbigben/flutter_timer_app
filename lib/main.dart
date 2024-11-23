@@ -55,6 +55,7 @@ class _TimerPageState extends State<TimerPage> {
   // int _seconds = 0;
   bool _isRunning = false;
   bool _isPause = false;
+  bool _isAlarm = false;
 
   // SEを鳴らす時間の選択肢とデフォルトの設定
   int _selectedPlayDuration = 3; // デフォルトは3分
@@ -97,6 +98,9 @@ class _TimerPageState extends State<TimerPage> {
 // アラーム音の停止
   Future<void> stopAlarmSound() async {
     await _audioPlayer.stop();
+    setState(() {
+      _isAlarm = false;
+    });
 
   }
 
@@ -116,6 +120,7 @@ class _TimerPageState extends State<TimerPage> {
             _timer!.cancel();
             if (_isRunning != false) {
               logger.info('Alarm started');
+              _isAlarm = true;
               playAlarmSound(); // タイマーがゼロになったらアラームを再生
             }
             else {
@@ -318,7 +323,7 @@ class _TimerPageState extends State<TimerPage> {
                 SizedBox(width: 30),
                 // 停止／リセットボタン
                 IconButton(
-                  onPressed: _resetTimer,
+                  onPressed: _isAlarm || ((_duration.inSeconds > 0) && _isPause)  ? _resetTimer : null,
                   style: IconButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10), // 角丸の半径
