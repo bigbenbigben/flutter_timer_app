@@ -295,7 +295,7 @@ class _TimerPageState extends State<TimerPage> {
               children: [
                 // 設定ボタン
                 IconButton(
-                  onPressed: _showTimePicker,
+                  onPressed: _timer?.isActive != true && !_isAlarm ? _showTimePicker : null,
                   style: IconButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10), // 角丸の半径
