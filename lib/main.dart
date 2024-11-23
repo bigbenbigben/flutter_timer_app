@@ -103,7 +103,7 @@ class _TimerPageState extends State<TimerPage> {
   void _startTimer() {
     if (_timer == null || !_timer!.isActive) {
       _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-        logger.info('test');
+        logger.info('Timer start');
         setState(() {
           if (_duration.inSeconds > 0) {
             _duration -= Duration(seconds: 1);
