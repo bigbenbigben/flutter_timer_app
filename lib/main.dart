@@ -79,9 +79,6 @@ class _TimerPageState extends State<TimerPage> {
     try {
       int playDuration = _selectedPlayDuration * 60; // 秒単位に変換
       int elapsed = 0;
-
-      await _audioPlayer.play(AssetSource('sounds/se.mp3'));
-      await Future.delayed(Duration(seconds: 3)); // 再生が終わるまで待機
       while (elapsed < playDuration) {
         _audioPlayer.seek(Duration.zero);
         await _audioPlayer.play(AssetSource('sounds/se.mp3'));
