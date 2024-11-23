@@ -244,8 +244,6 @@ class _TimerPageState extends State<TimerPage> {
   void _resetTimer() {
     if (_timer != null && !_timer!.isActive) {
       _timer!.cancel(); // タイマーをキャンセル
-      // _isRunning = false; // タイマーが動いていない状態にリセット
-      // _isPause = false;
       stopAlarmSound();
       logger.info('reset timer');
       setState(() {
