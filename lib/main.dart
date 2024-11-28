@@ -48,10 +48,10 @@ class MyApp extends StatelessWidget {
 class TimerPage extends StatefulWidget {
   const TimerPage({super.key}); // super.key を直接書くだけ！
   @override
-  _TimerPageState createState() => _TimerPageState();
+  _TimerPageState createState() => _TimerPageState();  // テスト用
 }
 
-class _TimerPageState extends State<TimerPage> {
+class _TimerPageState extends State<TimerPage> {      // テスト用
   Duration _duration = const Duration(hours: 0, minutes: 0, seconds: 0);
   Duration _setDuration = const Duration(hours: 0, minutes: 0, seconds: 0);
   Timer? _timer;
@@ -84,7 +84,6 @@ class _TimerPageState extends State<TimerPage> {
       int playDuration = _selectedPlayDuration * 60; // 秒単位に変換
       int elapsed = 0;
       while (elapsed < playDuration) {
-        _audioPlayer.seek(Duration.zero);
         await _audioPlayer.play(AssetSource('sounds/se.mp3'));
         await Future.delayed(const Duration(seconds: 3)); // 再生が終わるまで待機
         if (!_isRunning) break;
