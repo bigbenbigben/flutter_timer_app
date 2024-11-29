@@ -48,10 +48,10 @@ class MyApp extends StatelessWidget {
 class TimerPage extends StatefulWidget {
   const TimerPage({super.key}); // super.key を直接書くだけ！
   @override
-  State<TimerPage> createState() => _TimerPageState();  // テスト用
+  State<TimerPage> createState() => _TimerPageState();
 }
 
-class _TimerPageState extends State<TimerPage> {      // テスト用
+class _TimerPageState extends State<TimerPage> {
   Duration _duration = const Duration(hours: 0, minutes: 0, seconds: 0);
   Duration _setDuration = const Duration(hours: 0, minutes: 0, seconds: 0);
   Timer? _timer;
