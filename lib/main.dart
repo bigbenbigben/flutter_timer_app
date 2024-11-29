@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
 class TimerPage extends StatefulWidget {
   const TimerPage({super.key}); // super.key を直接書くだけ！
   @override
-  _TimerPageState createState() => _TimerPageState();  // テスト用
+  State<TimerPage> createState() => _TimerPageState();  // テスト用
 }
 
 class _TimerPageState extends State<TimerPage> {      // テスト用
